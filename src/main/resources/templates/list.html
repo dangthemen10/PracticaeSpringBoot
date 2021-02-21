@@ -13,7 +13,7 @@
         </button>
         <span th:text="${success}"></span>
     </div>
-    <div class="row">
+    <div class="row-md-3">
         <a th:href="@{/student/create}" class="btn btn-success pull-left">
             <span class="glyphicon glyphicon-plus"></span> Add new employee
         </a>
@@ -30,7 +30,7 @@
         <h3>No employee</h3>
     </th:block>
 
-    <th:block th:unless="${#lists.isEmpty(employees)}">
+    <th:block th:unless="${#lists.isEmpty(student)}">
         <div class="row">
             <table class="table table-bordered table-hover">
                 <thead>
