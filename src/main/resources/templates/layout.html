@@ -37,19 +37,23 @@
 </head>
 <body>
 <nav th:fragment="header">
-    <div class="container">
+    <div class="container-fluid">
         <div class="navbar">
             <button type="button" class="btn btn-outline-primary">
-                <a class="navbar-brand" th:href="@{/student}">MyEmployee</a>
+                <a class="navbar-brand" th:href="@{/student/page/1}">MyEmployee</a>
             </button>
         </div>
     </div>
 </nav>
-
 <h1>Main content</h1>
 
-<footer th:fragment="footer" class="container">
-    Copyright © 2017 - 2019
-</footer>
+<th:block>
+    <div th:fragment="footer">
+        <footer class="container">
+            <p class="float-right"><a href="#">Back to top</a></p>
+            <p>© 2017-2018 Company, Inc. · <a href="#">Privacy</a> · <a href="#">Terms</a></p>
+        </footer>
+    </div>
+</th:block>
 </body>
 </html>
