@@ -14,12 +14,18 @@
         <span th:text="${success}"></span>
     </div>
     <div class="row row-sm-12">
-        <div class="col-sm-8 float-right">
+        <div class="col-sm-2 float-right">
             <a th:href="@{/student/create}" class="btn btn-success pull-left">
                 <span class="glyphicon glyphicon-plus"></span> Add new employee
             </a>
         </div>
-        <div class="col-4 float-left">
+        <div class="col-sm-2 float-right">
+            <a th:href="@{/download/file}" class="btn btn-primary pull-left">
+                <span class="glyphicon glyphicon-plus"></span> Download File
+            </a>
+<!--            <button class="btn btn-outline-success" id="btn-download" data-target="/download/file"><i class="fa fa-download"></i> Download</button>-->
+        </div>
+        <div class="col-8 float-right">
             <form class="form-inline" action="#"
                   th:action="@{/student/search}" method="GET">
                 <div class="form-group">
@@ -93,5 +99,12 @@
 <!-- /.container -->
 
 <footer th:replace="layout :: footer"></footer>
+<script>
+    $(document).ready(()=>{
+        $("#btn-download").click( () => {
+             window.location.href = "/download/file";
+        });
+    });
+</script>
 </body>
 </html>

@@ -3,7 +3,12 @@ package com.techbase.practicespringboot.controller;
 import com.techbase.practicespringboot.entity.StudentEntity;
 import com.techbase.practicespringboot.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,6 +19,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 
@@ -40,6 +47,15 @@ public class StudentController {
         model.addAttribute("totalItems", page.getTotalElements());
         model.addAttribute("student", listEmployees);
         return "list";
+    }
+
+    @GetMapping("/download/file")
+    public ResponseEntity<Resource> downloadFile() throws IOException {
+        InputStreamResource resource = new InputStreamResource(studentService.writeDataToCsv());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=customers.tsv")
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(resource);
     }
 
     @GetMapping("/student/create")
