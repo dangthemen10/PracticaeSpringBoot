@@ -36,12 +36,13 @@
             </form>
         </div>
     </div>
+    <div id="customerTable">
     <th:block th:if="${#lists.isEmpty(student)}">
         <h3>No employee</h3>
     </th:block>
 
     <th:block th:unless="${#lists.isEmpty(student)}">
-        <div class="row-md-12">
+        <div class="row-md-12"  >
             <table class="table table-bordered table-hover">
                 <thead>
                 <tr>
@@ -53,7 +54,7 @@
                     <th>Delete</th>
                 </tr>
                 </thead>
-                <tbody>
+                <tbody >
                 <tr th:each="contact,iterStat : ${student}">
                     <td th:text="${iterStat.count}"></td>
                     <td th:text="${contact.name}"></td>
@@ -70,11 +71,12 @@
                 <div class="page-item">
                     Total Rows: [[${totalItems}]]
                 </div>
-                <ul class="pagination">
-                    <li class="page-item">
-                        <a th:if="${currentPage <= totalPages && currentPage - 1 > 0 }"
-                           th:href="@{'/student/page/' + ${currentPage-1} }"
-                           class="page-link" tabindex="-1">Previous</a>
+                <ul class="pagination" id="btn-get">
+                    <li id="btn=last" class="page-item" th:if="${currentPage <= totalPages && currentPage - 1 > 0 }">
+<!--                        <a th:if="${currentPage <= totalPages && currentPage - 1 > 0 }"-->
+<!--                           th:href="@{'/student/page/' + ${currentPage-1} }"-->
+<!--                           class="page-link" tabindex="-1">Previous</a>-->
+                        <button th:onclick="|getUser2(${currentPage-1})|" class="page-link">Previous</button>
                     </li>
 
                     <div th:each="i: ${#numbers.sequence(1, totalPages)}">
@@ -87,14 +89,17 @@
                                                             th:unless="${currentPage != i}">[[${i}]]</span></li>
                     </div>
 
-                    <li class="page-item">
-                        <a th:if="${currentPage < totalPages}" th:href="@{'/student/page/' + ${currentPage + 1}}"
-                           class="page-link">Next</a>
+                    <li id="btn-next" class="page-item" th:if="${currentPage < totalPages}">
+<!--                        <a th:if="${currentPage < totalPages}" th:href="@{'/student/page/' + ${currentPage + 1}}"-->
+<!--                           class="page-link">Next</a>-->
+                        <button th:onclick="|getUser2(${currentPage+1})|" class="page-link" >Next</button>
+
                     </li>
                 </ul>
             </nav>
         </div>
     </th:block>
+    </div>
 </div>
 <!-- /.container -->
 
@@ -104,7 +109,37 @@
         $("#btn-download").click( () => {
              window.location.href = "/download/file";
         });
+
     });
+    function getUser(currentPage){
+        $.ajax({
+            url: `/student?page=${currentPage}`,
+            success: function(result){
+                var customerRow = '';
+                $.each(result, (i, stu) => {
+                    customerRow += `<tr>
+                                  <td> ${i+1} </td>
+                                  <td> ${stu.name} </td>
+                                  <td> ${stu.age} </td>
+                                  <td> ${stu.gender} </td>
+                                  <td><a th:href="@{/student/{id}/edit(id=${stu.id})}">Edit</a></td>
+                                  <td><a th:href="@{/student/{id}/delete(id=${stu.id})}">Delete</a></td>
+                               </tr>`;
+                });
+                $('#customerTable').replaceWith(customerRow);
+            },
+        });
+    }
+    function getUser2(currentPage){
+        $.ajax({
+            url: `/student?page=${currentPage}`,
+            success: function(result){
+                $('#customerTable').replaceWith(result);
+            },
+        });
+    }
+
+
 </script>
 </body>
 </html>

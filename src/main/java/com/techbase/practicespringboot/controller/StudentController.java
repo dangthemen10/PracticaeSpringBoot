@@ -48,6 +48,19 @@ public class StudentController {
         model.addAttribute("student", listEmployees);
         return "list";
     }
+    @GetMapping("/student")
+    public String abc( @RequestParam(name = "page", required = false, defaultValue = "1") Integer pageNo,
+                       @RequestParam(name = "size", required = false, defaultValue = "5") Integer pageSize,
+                       Model model) {
+
+        Page<StudentEntity> page = studentService.findAllStudent(pageNo, pageSize);
+        List<StudentEntity> listEmployees = page.getContent();
+        model.addAttribute("currentPage", pageNo);
+        model.addAttribute("totalPages", page.getTotalPages());
+        model.addAttribute("totalItems", page.getTotalElements());
+        model.addAttribute("student", listEmployees);
+        return "table";
+    }
 
     @GetMapping("/download/file")
     public ResponseEntity<Resource> downloadFile() throws IOException {
