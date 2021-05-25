@@ -20,8 +20,9 @@ import java.util.List;
 @Service
 public class StudentServiceImp implements StudentService {
 
-    private static final String[] HEADERS = {"Id", "Name", "Age", "Gender"};
-    private static final CSVFormat FORMAT = CSVFormat.EXCEL.withHeader(HEADERS);
+    private static final CSVFormat FORMAT = CSVFormat.newFormat('\t')
+            .withHeader("Id", "Name", "Age", "Gender")
+            .withRecordSeparator('\n');
 
 
     @Autowired
