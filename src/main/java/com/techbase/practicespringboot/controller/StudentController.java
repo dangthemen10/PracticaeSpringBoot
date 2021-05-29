@@ -19,51 +19,38 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.List;
-
 
 @Controller
 public class StudentController {
+    private static final Integer PAGE_NO = 1;
+    private static final Integer PAGE_SIZE = 5;
+
     @Autowired
     private StudentService studentService;
 
-    @GetMapping("/")
-    public String viewHomePage(Model model) {
-        return index(1, model);
-    }
-
-    @GetMapping("/student/page/{pageNo}")
-    public String index(@PathVariable(value = "pageNo") int pageNo, Model model) {
-
-//        @RequestParam(name = "page", required = false, defaultValue = "0") Integer pageNo
-        int pageSize = 5;
-        Page<StudentEntity> page = studentService.findAllStudent(pageNo, pageSize);
-        List<StudentEntity> listEmployees = page.getContent();
-
-        model.addAttribute("currentPage", pageNo);
-        model.addAttribute("totalPages", page.getTotalPages());
-        model.addAttribute("totalItems", page.getTotalElements());
-        model.addAttribute("student", listEmployees);
+    @GetMapping({"/student/index", "/"})
+    public String index(Model model) {
+        Page<StudentEntity> page = studentService.findAllStudent(PAGE_NO, PAGE_SIZE);
+        Integer currentPage = page.getNumber() + 1;
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("page", page);
         return "list";
     }
-    @GetMapping("/student")
-    public String abc( @RequestParam(name = "page", required = false, defaultValue = "1") Integer pageNo,
-                       @RequestParam(name = "size", required = false, defaultValue = "5") Integer pageSize,
-                       Model model) {
+
+    @GetMapping("/student/page")
+    public String abc(@RequestParam(name = "page", required = false, defaultValue = "1") Integer pageNo,
+                      @RequestParam(name = "size", required = false, defaultValue = "5") Integer pageSize,
+                      Model model) {
 
         Page<StudentEntity> page = studentService.findAllStudent(pageNo, pageSize);
-        List<StudentEntity> listEmployees = page.getContent();
-        model.addAttribute("currentPage", pageNo);
-        model.addAttribute("totalPages", page.getTotalPages());
-        model.addAttribute("totalItems", page.getTotalElements());
-        model.addAttribute("student", listEmployees);
+        Integer currentPage = page.getNumber() + 1;
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("page", page);
         return "table";
     }
 
     @GetMapping("/download/file")
-    public ResponseEntity<Resource> downloadFile() throws IOException {
+    public ResponseEntity<Resource> downloadFile() {
         InputStreamResource resource = new InputStreamResource(studentService.writeDataToCsv());
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=customers.tsv")
@@ -90,7 +77,7 @@ public class StudentController {
         }
         studentService.saveStudent(studentEntity);
         redirect.addFlashAttribute("success", "Saved student successfully!");
-        return "redirect:/student/page/1";
+        return "redirect:/student/index";
     }
 
     @GetMapping("/student/{id}/delete")
@@ -98,13 +85,13 @@ public class StudentController {
         StudentEntity student = studentService.findOneStudent(id);
         studentService.deleteStudent(student);
         redirect.addFlashAttribute("success", "Deleted student successfully!");
-        return "redirect:/student/page/1";
+        return "redirect:/student/index";
     }
 
     @GetMapping("/student/search")
     public String search(@RequestParam("s") String s, Model model) {
         if (s.equals("")) {
-            return "redirect:/student/page/1";
+            return "redirect:/student/index";
         }
 
         model.addAttribute("student", studentService.searchStudent(s));

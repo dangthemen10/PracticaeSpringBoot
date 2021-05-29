@@ -6,6 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Spring MyEmployee</title>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css' rel='stylesheet' />
+    <!-- Load the `mapbox-gl-geocoder` plugin. -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.min.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.css" type="text/css">
+
+    <!-- Promise polyfill script is required -->
+    <!-- to use Mapbox GL Geocoder in IE 11. -->
+    <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
 
     <!-- Bootstrap -->
     <link
@@ -42,7 +52,7 @@
     <div class="container-fluid">
         <div class="navbar">
             <button type="button" class="btn btn-outline-primary">
-                <a class="navbar-brand" th:href="@{/student/page/1}">MyEmployee</a>
+                <a class="navbar-brand" th:href="@{/student/index}">MyEmployee</a>
             </button>
         </div>
     </div>
@@ -51,7 +61,7 @@
 
 <th:block>
     <div th:fragment="footer">
-        <footer class="container">
+        <footer class="container-fluid">
             <p class="float-right"><a href="#">Back to top</a></p>
             <p>© 2017-2018 Company, Inc. · <a href="#">Privacy</a> · <a href="#">Terms</a></p>
         </footer>

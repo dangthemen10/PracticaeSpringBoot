@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="layout :: head"></head>
+<style>
+    body { margin:0; padding:0; }
+    #map { top:0; bottom:0;
+    width: 320px; }
+</style>
 <body>
 <nav th:replace="layout :: header"></nav>
 
-<div class="container">
+<div class="container-fluid" >
     <div th:if="${success}"
          class="row-md-12 alert alert-success alert-dismissible">
         <button type="button" class="close" data-dismiss="alert"
@@ -14,18 +19,29 @@
         <span th:text="${success}"></span>
     </div>
     <div class="row row-sm-12">
-        <div class="col-sm-2 float-right">
+        <div class="col-sm-1 float-right">
             <a th:href="@{/student/create}" class="btn btn-success pull-left">
                 <span class="glyphicon glyphicon-plus"></span> Add new employee
             </a>
         </div>
-        <div class="col-sm-2 float-right">
+        <div class="col-sm-2 float-right" style="padding-left: 93px;">
             <a th:href="@{/download/file}" class="btn btn-primary pull-left">
                 <span class="glyphicon glyphicon-plus"></span> Download File
             </a>
-<!--            <button class="btn btn-outline-success" id="btn-download" data-target="/download/file"><i class="fa fa-download"></i> Download</button>-->
         </div>
-        <div class="col-8 float-right">
+        <div class="input-group col-sm-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">@Center</span>
+            </div>
+            <input id="center" type="text" class="form-control">
+        </div>
+        <div class="input-group col-sm-3">
+            <div class="input-group-prepend">
+                <button id="panTo" class="btn btn-outline-secondary" type="button">JumTo</button>
+            </div>
+            <input type="text" class="form-control" id="latLng">
+        </div>
+        <div class="col-sm-3 float-right">
             <form class="form-inline" action="#"
                   th:action="@{/student/search}" method="GET">
                 <div class="form-group">
@@ -36,103 +52,162 @@
             </form>
         </div>
     </div>
-    <div id="customerTable">
-    <th:block th:if="${#lists.isEmpty(student)}">
-        <h3>No employee</h3>
-    </th:block>
+    <div class="row row-md-12 row-sm-12">
+        <div id="map" class="col-sm-6 col-md-6"> </div>
+        <div id="customerTable" class="col-sm-6 col-md-6">
+            <th:block th:if="${#lists.isEmpty(page.getContent())}">
+                <h3>No employee</h3>
+            </th:block>
 
-    <th:block th:unless="${#lists.isEmpty(student)}">
-        <div class="row-md-12"  >
-            <table class="table table-bordered table-hover">
-                <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Name</th>
-                    <th>Age</th>
-                    <th>Gender</th>
-                    <th>Edit</th>
-                    <th>Delete</th>
-                </tr>
-                </thead>
-                <tbody >
-                <tr th:each="contact,iterStat : ${student}">
-                    <td th:text="${iterStat.count}"></td>
-                    <td th:text="${contact.name}"></td>
-                    <td th:text="${contact.age}"></td>
-                    <td th:text="${contact.gender}"></td>
-                    <td><a th:href="@{/student/{id}/edit(id=${contact.id})}">Edit</a></td>
-                    <td><a th:href="@{/student/{id}/delete(id=${contact.id})}">Delete</a></td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-        <div th:if="${totalPages > 1}" class="row row-md-12 row-sm-12">
-            <nav aria-label="Page navigation example">
-                <div class="page-item">
-                    Total Rows: [[${totalItems}]]
+            <th:block th:unless="${#lists.isEmpty(page.getContent())}">
+                <div class="row-md-12"  >
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>Gender</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                        </thead>
+                        <tbody >
+                        <tr th:each="contact,iterStat : ${page.getContent()}">
+                            <td th:text="${iterStat.count}"></td>
+                            <td th:text="${contact.name}"></td>
+                            <td th:text="${contact.age}"></td>
+                            <td th:text="${contact.gender}"></td>
+                            <td><a th:href="@{/student/{id}/edit(id=${contact.id})}">Edit</a></td>
+                            <td><a th:href="@{/student/{id}/delete(id=${contact.id})}">Delete</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <ul class="pagination" id="btn-get">
-                    <li id="btn=last" class="page-item" th:if="${currentPage <= totalPages && currentPage - 1 > 0 }">
-<!--                        <a th:if="${currentPage <= totalPages && currentPage - 1 > 0 }"-->
-<!--                           th:href="@{'/student/page/' + ${currentPage-1} }"-->
-<!--                           class="page-link" tabindex="-1">Previous</a>-->
-                        <button th:onclick="|getUser2(${currentPage-1})|" class="page-link">Previous</button>
-                    </li>
-
-                    <div th:each="i: ${#numbers.sequence(1, totalPages)}">
-                        <div th:if="${currentPage != i}">
-                            <li class="page-item">
-                                <a class="page-link" th:href="@{'/student/page/' + ${i}}">[[${i}]]</a>
-                            </li>
+                <div th:if="${page.getTotalPages() > 1}" class="row row-md-12 row-sm-12" style="padding-left: 320px;">
+                    <nav aria-label="Page navigation example">
+                        <div class="page-item">
+                            Total Rows: [[${page.getTotalElements()}]]
                         </div>
-                        <li class="page-item active "><span class="page-link"
-                                                            th:unless="${currentPage != i}">[[${i}]]</span></li>
-                    </div>
+                        <ul class="pagination" id="btn-get">
+                            <li id="btn=last" class="page-item" th:if="${page.hasPrevious()}">
+                                <button th:onclick="|getUser2(${currentPage-1})|" class="page-link">Previous</button>
+                            </li>
+                            <li class="page-item" th:unless="${page.hasPrevious()}">
+                                <button class="page-link">Previous</button>
+                            </li>
 
-                    <li id="btn-next" class="page-item" th:if="${currentPage < totalPages}">
-<!--                        <a th:if="${currentPage < totalPages}" th:href="@{'/student/page/' + ${currentPage + 1}}"-->
-<!--                           class="page-link">Next</a>-->
-                        <button th:onclick="|getUser2(${currentPage+1})|" class="page-link" >Next</button>
-
-                    </li>
-                </ul>
-            </nav>
+                            <div th:each="i: ${#numbers.sequence(1, page.getTotalPages())}">
+                                <div th:if="${currentPage != i}">
+                                    <li class="page-item">
+                                        <a class="page-link" th:onclick="|getUser2(${i})|">[[${i}]]</a>
+                                    </li>
+                                </div>
+                                <li class="page-item active "><span class="page-link"
+                                                                    th:unless="${currentPage != i}">[[${i}]]</span></li>
+                            </div>
+                            <li id="btn-next" class="page-item" th:if="${page.hasNext()}">
+                                <button th:onclick="|getUser2(${currentPage+1})|" class="page-link" >Next</button>
+                            </li>
+                            <li class="page-item" th:unless="${page.hasNext()}">
+                                <button class="page-link" >Next</button>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </th:block>
         </div>
-    </th:block>
     </div>
 </div>
 <!-- /.container -->
 
 <footer th:replace="layout :: footer"></footer>
 <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiZGFuZ3RoZW1lbjEwIiwiYSI6ImNrcDhmMjZ4ZzA4M3Iyb21uZm5ibzI4NG8ifQ.vHjqFsqKMyj6q_tsmrYcNg';
+    var mapCenter = new mapboxgl.LngLat(139.72116702175174, 35.64997652994234);
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: mapCenter,
+        doubleClickZoom: true,
+        zoom: 15
+    });
+    map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+    var scale = new mapboxgl.ScaleControl({
+      maxWidth: 80,
+      unit: 'metric'
+    });
+    map.addControl(scale);
+    map.scrollZoom.setZoomRate(1/25);
+    map.addControl(
+        new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            mapboxgl: mapboxgl
+        })
+    );
+
+
+    var marker1 = new mapboxgl.Marker({
+        color: "red"
+    }).setLngLat(mapCenter)
+    .addTo(map);
+
+    map.on('drag', function(e) {
+        var marker = new mapboxgl.Marker({
+            color: "red"
+        }).setLngLat(map.getCenter())
+        .addTo(map);
+
+        var marker = marker.getLngLat();
+        var lon = marker.lng;
+        var lat = marker.lat;
+        $("#center").val(`${lon}, ${lat}`);
+    });
+
+    map.on('drag', function(e) {
+        var marker = new mapboxgl.Marker({
+            color: "red"
+        }).setLngLat(map.getCenter())
+        .addTo(map);
+
+        var marker = marker.getLngLat();
+        var lon = marker.lng;
+        var lat = marker.lat;
+        $("#center").val(`${lon}, ${lat}`);
+    });
+
+<!--    map.on('load', function() {-->
+<!--      $("#panTo").on('click', function(e) {-->
+<!--        var coordinate = $("#latLng").val().split(",");-->
+<!--        var lngN = parseFloat(coordinate[0]);-->
+<!--        var latN = parseFloat(coordinate[1]);-->
+<!--        map.panTo([lngN,latN], {duration: 5000});-->
+<!--      });-->
+<!--    });-->
+    $("#panTo").on('click', function () {
+        var coordinate = $("#latLng").val().split(",");
+        var lngN = parseFloat(coordinate[0]);
+        var latN = parseFloat(coordinate[1]);
+        map.flyTo({
+        center: [
+            lngN,
+            latN
+        ],
+        essential: true
+        });
+    });
+
+
+
     $(document).ready(()=>{
         $("#btn-download").click( () => {
              window.location.href = "/download/file";
         });
 
     });
-    function getUser(currentPage){
-        $.ajax({
-            url: `/student?page=${currentPage}`,
-            success: function(result){
-                var customerRow = '';
-                $.each(result, (i, stu) => {
-                    customerRow += `<tr>
-                                  <td> ${i+1} </td>
-                                  <td> ${stu.name} </td>
-                                  <td> ${stu.age} </td>
-                                  <td> ${stu.gender} </td>
-                                  <td><a th:href="@{/student/{id}/edit(id=${stu.id})}">Edit</a></td>
-                                  <td><a th:href="@{/student/{id}/delete(id=${stu.id})}">Delete</a></td>
-                               </tr>`;
-                });
-                $('#customerTable').replaceWith(customerRow);
-            },
-        });
-    }
     function getUser2(currentPage){
         $.ajax({
-            url: `/student?page=${currentPage}`,
+            url: `/student/page?page=${currentPage}`,
             success: function(result){
                 $('#customerTable').replaceWith(result);
             },
