@@ -25,56 +25,37 @@ var marker = new mapboxgl.Marker({color: "red"})
   .setLngLat([0, 0])
   .addTo(map);
 
-map.on('load', function(e) {
-  marker.setLngLat(map.getCenter());
-  var lngLat = marker.getLngLat();
-    var lon = lngLat.lng;
-    var lat = lngLat.lat;
-    $("#center").val(`${lon}, ${lat}`);
+map.on('load', e => {
+  createMarker(marker);
 });
 
-map.on('movestart', function(e) {
-  marker.setLngLat(map.getCenter());
-  lngLat = marker.getLngLat();
-    var lon = lngLat.lng;
-    var lat = lngLat.lat;
-    $("#center").val(`${lon}, ${lat}`);
+map.on('movestart', e => {
+  createMarker(marker);
 });
 
-map.on('move', function(e) {
-  marker.setLngLat(map.getCenter());
-  lngLat = marker.getLngLat();
-    var lon = lngLat.lng;
-    var lat = lngLat.lat;
-    $("#center").val(`${lon}, ${lat}`);
+map.on('move', e => {
+  createMarker(marker);
 });
 
-map.on('moveend', function(e) {
-  marker.setLngLat(map.getCenter());
-  lngLat = marker.getLngLat();
-    var lon = lngLat.lng;
-    var lat = lngLat.lat;
-    $("#center").val(`${lon}, ${lat}`);
+map.on('moveend', e => {
+  createMarker(marker);
 });
 
-$("#panTo").on('click', function () {
-    var coordinate = $("#latLng").val().split(",");
-    var lngN = parseFloat(coordinate[0]);
-    var latN = parseFloat(coordinate[1]);
-    map.flyTo({
-    center: [
-        lngN,
-        latN
-    ],
-    essential: true
-    });
-});
 
 $(document).ready(()=>{
     $("#btn-download").click( () => {
          window.location.href = "/download/file";
     });
 
+    $("#btn-jum").on('click', () => {
+        let coordinate = $("#inputGroupSelect03").val();
+        jumTo(coordinate);
+    });
+
+    $("#panTo").on('click', () => {
+        let coordinate = $("#latLng").val();
+        jumTo(coordinate);
+    });
 });
 function getUser2(currentPage){
     $.ajax({
@@ -83,4 +64,25 @@ function getUser2(currentPage){
             $('#customerTable').replaceWith(result);
         },
     });
+}
+
+function jumTo(cdt){
+    var coordinate = cdt.trim().split(",");
+    var lngN = parseFloat(coordinate[0]);
+    var latN = parseFloat(coordinate[1]);
+    map.flyTo({
+        center: [
+            lngN,
+            latN
+        ],
+        essential: true
+    });
+}
+
+function createMarker(marker){
+    marker.setLngLat(map.getCenter());
+    var lngLat = marker.getLngLat();
+    var lon = lngLat.lng;
+    var lat = lngLat.lat;
+    $("#center").val(`${lon}, ${lat}`);
 }
