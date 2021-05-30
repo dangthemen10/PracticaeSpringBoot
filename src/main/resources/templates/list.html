@@ -3,8 +3,10 @@
 <head th:replace="layout :: head"></head>
 <style>
     body { margin:0; padding:0; }
-    #map { top:0; bottom:0;
-    width: 320px; }
+    #map {
+        top:0; bottom:0;
+        width: 320px;
+    }
 </style>
 <body>
 <nav th:replace="layout :: header"></nav>
@@ -54,6 +56,7 @@
     </div>
     <div class="row row-md-12 row-sm-12">
         <div id="map" class="col-sm-6 col-md-6"> </div>
+
         <div id="customerTable" class="col-sm-6 col-md-6">
             <th:block th:if="${#lists.isEmpty(page.getContent())}">
                 <h3>No employee</h3>
@@ -122,99 +125,6 @@
 <!-- /.container -->
 
 <footer th:replace="layout :: footer"></footer>
-<script>
-    mapboxgl.accessToken = 'pk.eyJ1IjoiZGFuZ3RoZW1lbjEwIiwiYSI6ImNrcDhmMjZ4ZzA4M3Iyb21uZm5ibzI4NG8ifQ.vHjqFsqKMyj6q_tsmrYcNg';
-    var mapCenter = new mapboxgl.LngLat(139.72116702175174, 35.64997652994234);
-    var map = new mapboxgl.Map({
-        container: 'map',
-        style: 'mapbox://styles/mapbox/streets-v11',
-        center: mapCenter,
-        doubleClickZoom: true,
-        zoom: 15
-    });
-    map.addControl(new mapboxgl.NavigationControl(), 'top-left');
-    var scale = new mapboxgl.ScaleControl({
-      maxWidth: 80,
-      unit: 'metric'
-    });
-    map.addControl(scale);
-    map.scrollZoom.setZoomRate(1/25);
-    map.addControl(
-        new MapboxGeocoder({
-            accessToken: mapboxgl.accessToken,
-            mapboxgl: mapboxgl
-        })
-    );
-
-
-    var marker1 = new mapboxgl.Marker({
-        color: "red"
-    }).setLngLat(mapCenter)
-    .addTo(map);
-
-    map.on('drag', function(e) {
-        var marker = new mapboxgl.Marker({
-            color: "red"
-        }).setLngLat(map.getCenter())
-        .addTo(map);
-
-        var marker = marker.getLngLat();
-        var lon = marker.lng;
-        var lat = marker.lat;
-        $("#center").val(`${lon}, ${lat}`);
-    });
-
-    map.on('drag', function(e) {
-        var marker = new mapboxgl.Marker({
-            color: "red"
-        }).setLngLat(map.getCenter())
-        .addTo(map);
-
-        var marker = marker.getLngLat();
-        var lon = marker.lng;
-        var lat = marker.lat;
-        $("#center").val(`${lon}, ${lat}`);
-    });
-
-<!--    map.on('load', function() {-->
-<!--      $("#panTo").on('click', function(e) {-->
-<!--        var coordinate = $("#latLng").val().split(",");-->
-<!--        var lngN = parseFloat(coordinate[0]);-->
-<!--        var latN = parseFloat(coordinate[1]);-->
-<!--        map.panTo([lngN,latN], {duration: 5000});-->
-<!--      });-->
-<!--    });-->
-    $("#panTo").on('click', function () {
-        var coordinate = $("#latLng").val().split(",");
-        var lngN = parseFloat(coordinate[0]);
-        var latN = parseFloat(coordinate[1]);
-        map.flyTo({
-        center: [
-            lngN,
-            latN
-        ],
-        essential: true
-        });
-    });
-
-
-
-    $(document).ready(()=>{
-        $("#btn-download").click( () => {
-             window.location.href = "/download/file";
-        });
-
-    });
-    function getUser2(currentPage){
-        $.ajax({
-            url: `/student/page?page=${currentPage}`,
-            success: function(result){
-                $('#customerTable').replaceWith(result);
-            },
-        });
-    }
-
-
-</script>
+<script th:src="@{/js/custom-mapbox.js}"></script>
 </body>
 </html>
